@@ -26,6 +26,8 @@ Then Mullvad connects. Its kill switch blocks everything that leaves outside the
 
 Quitting and reopening the Tailscale app *after* Mullvad is connected fixes it immediately. The new extension process sees `defaultRoute=utun5` (Mullvad's tunnel) and logs in within seconds. The watchdog automates exactly that.
 
+The underlying cause is in Tailscale's macOS default-route selection (`net/netmon/defaultroute_darwin.go`): the interface reported by the Swift NWPathMonitor at startup takes precedence over the routing table and is never refreshed when another VPN takes over the default route. Reported upstream as [tailscale/tailscale#21781](https://github.com/tailscale/tailscale/issues/21781). Once that's fixed, the watchdog shouldn't be needed anymore.
+
 ## Install
 
 ```sh
